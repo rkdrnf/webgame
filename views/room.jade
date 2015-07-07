@@ -1,0 +1,11 @@
+doctype html
+head
+	title room#{roomID}
+	include ./includes/defaultScripts.jade
+	script(src='roomClient')
+
+body
+	h1 MyRoom
+	ul#users
+		each user in users
+			li.user #{user.name}

@@ -1,0 +1,14 @@
+doctype html
+head
+	title lobby
+
+body
+	ul#rooms
+		each room in rooms
+			li 
+				a(href='room/#{room.id}') #{room.id}
+	
+
+	form(action='room', method='post')
+		button newRoom
+		

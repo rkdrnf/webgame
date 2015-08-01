@@ -6,18 +6,17 @@ require('array.prototype.find');
 
 roomManager.r_new = function(req, res){
 	var newRoom = roomManager.newRoom();
+	var user = userManager.createifnew(req, req.session.user_id);
+	newRoom.join(user);
 	res.redirect(newRoom.path());
-	var user = userManager.createifnew(req.session.user_id);
-	newRoom.users.push(user);
-	console.log('after redirect');
 };
 
 roomManager.r_join = function(req, res){
 	var room = roomManager.getRoom(req.params.id);
+	var user = userManager.createifnew(req, req.session.user_id);
+	room.join(user);
+
 	res.render('room', { users: room.users, roomID: room.id});
-	var user = userManager.createifnew(req.session.user_id);
-	room.users.push(user);
-	console.log('after join');
 };
 
 
@@ -32,7 +31,6 @@ roomManager.newRoom = function()
 roomManager.getRoom = function(id)
 {
 	return this.rooms.find(function(element, index, array){
-		console.log("find" + element.id + "id : " + id);
 		return element.id == id;
 	});
 }
@@ -46,5 +44,16 @@ function room()
 
 	this.path = function(){
 		return "room/" + this.id;
+	}
+
+	this.join = function(user){
+		var exist = this.users.find(function(element, index, array){
+			return element.id == user.id;
+		});
+
+		if(!exist)
+		{
+			this.users.push(user);
+		}
 	}
 }

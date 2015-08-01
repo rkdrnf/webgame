@@ -7,12 +7,15 @@ var userManager = require('./userManager.js');
 var session = require('express-session');
 var uuid = require('uuid');
 
+
 app.use(session({
 	genid: function(req) {
 		return uuid.v1();
 	},
 	secret: 'mysecret'
 }));
+
+app.use(express.static('client'));
 
 app.set('views', './views');
 app.set('view engine', 'jade');
@@ -21,7 +24,7 @@ app.set('view engine', 'jade');
 //lobby routes
 app.get('/', function(req, res){
 	console.log(req.session);
-	var user = userManager.createifnew(req.sessionID);
+	var user = userManager.createifnew(req, req.sessionID);
 	res.render('lobby', { rooms: roomManager.rooms, user: user });
 });
 
@@ -38,6 +41,17 @@ io.on('connection', function(socket){
 		console.log('user disconnected');
 	});
 });
+
+
+//worker Threads
+var numCPUs= require('os').cpus().length
+
+for(var i = 0; i < numCPUs; i++)
+{
+	var child_process = require('child_process');
+	child_process.fork("workerThread");
+}
+
 
 
 //listen
